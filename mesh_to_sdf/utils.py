@@ -6,11 +6,17 @@ def scale_to_unit_sphere(mesh):
     if isinstance(mesh, trimesh.Scene):
         mesh = mesh.dump().sum()
 
-    vertices = mesh.vertices - mesh.bounding_box.centroid
-    distances = np.linalg.norm(vertices, axis=1)
-    vertices /= np.max(distances)
+    translation = mesh.bounding_box.centroid
 
-    return trimesh.Trimesh(vertices=vertices, faces=mesh.faces)
+    vertices = mesh.vertices - translation
+    distances = np.linalg.norm(vertices, axis=1)
+    scale = np.max(distances)
+    vertices /= scale
+
+    return_tuple = (trimesh.Trimesh(vertices=vertices, faces=mesh.faces),)
+    if get_transform:
+        return_tuple += ({"scale": np.max(distances), "translation": translation},)
+    return return_tuple
 
 def scale_to_unit_cube(mesh):
     if isinstance(mesh, trimesh.Scene):
