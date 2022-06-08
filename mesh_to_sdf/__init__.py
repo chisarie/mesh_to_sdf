@@ -4,11 +4,18 @@ from .surface_point_cloud import BadMeshException
 from .utils import scale_to_unit_cube, scale_to_unit_sphere, get_raster_points, check_voxels
 import trimesh
 
-def get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=None, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True):
+def get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=None, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True, make_watertight=True):
     if isinstance(mesh, trimesh.Scene):
         mesh = mesh.dump().sum()
     if not isinstance(mesh, trimesh.Trimesh):
         raise TypeError("The mesh parameter must be a trimesh mesh.")
+
+    if make_watertight:
+        verts, tris = mesh.vertices.astype(np.float64), mesh.faces.astype(np.int32)
+        processor = manifold.Processor(verts, tris)
+        vertices, triangles = processor.get_manifold_mesh(depth=8)
+        mesh.vertices = vertices
+        mesh.faces = triangles
 
     if bounding_radius is None:
         bounding_radius = np.max(np.linalg.norm(mesh.vertices, axis=1)) * 1.1
