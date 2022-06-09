@@ -12,6 +12,8 @@ pip3 install mesh-to-sdf
 If you're using Windows or Mac, you need to work around a bug in pyrender.
 Check the FAQs below.
 
+For the instructions to install the Python manifold wrapper: https://github.com/PRBonn/manifold_python
+
 ## Examples
 
 ### Voxelize a mesh
