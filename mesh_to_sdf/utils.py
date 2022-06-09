@@ -2,7 +2,7 @@ import functools
 import trimesh
 import numpy as np
 
-def scale_to_unit_sphere(mesh):
+def scale_to_unit_sphere(mesh, get_transform=False):
     if isinstance(mesh, trimesh.Scene):
         mesh = mesh.dump().sum()
 

@@ -3,6 +3,7 @@ from . import surface_point_cloud
 from .surface_point_cloud import BadMeshException
 from .utils import scale_to_unit_cube, scale_to_unit_sphere, get_raster_points, check_voxels
 import trimesh
+import manifold
 
 def get_surface_point_cloud(mesh, surface_point_method='scan', bounding_radius=None, scan_count=100, scan_resolution=400, sample_point_count=10000000, calculate_normals=True, make_watertight=True):
     if isinstance(mesh, trimesh.Scene):
@@ -57,7 +58,7 @@ def mesh_to_voxels(mesh, voxel_resolution=64, surface_point_method='scan', sign_
 
 # Sample some uniform points and some normally distributed around the surface as proposed in the DeepSDF paper
 def sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_method='scan', sign_method='normal', scan_count=100, scan_resolution=400, sample_point_count=10000000, normal_sample_count=11, min_size=0, return_gradients=False, transform_back=False):
-    mesh = scale_to_unit_sphere(mesh, transform_back=transform_back)
+    out = scale_to_unit_sphere(mesh, get_transform=transform_back)
     if not transform_back:
         (mesh,) = out
     else:
@@ -72,7 +73,7 @@ def sample_sdf_near_surface(mesh, number_of_points = 500000, surface_point_metho
     points, sdf = surface_point_cloud.sample_sdf_near_surface(number_of_points, surface_point_method=='scan', sign_method, normal_sample_count, min_size, return_gradients)
 
     if transform_back:
-        points = points * transform["scale"] + transform["translation"
+        points = points * transform["scale"] + transform["translation"]
         sdf = sdf * transform["scale"]
 
     return points, sdf
